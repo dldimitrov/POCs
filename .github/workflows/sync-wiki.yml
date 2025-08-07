@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout main repo
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Clone Wiki repository
         run: git clone https://github.com/dldimitrov/POCs.wiki.git wiki
@@ -19,7 +21,7 @@ jobs:
         run: |
           mkdir -p docs
           rsync -av --delete --exclude='.git' wiki/ docs/
-          # Optionally rename Home.md to index.md for TechDocs
+          # Rename Home.md to index.md for TechDocs if exists
           if [ -f docs/Home.md ]; then mv docs/Home.md docs/index.md; fi
 
       - name: Commit and push changes
@@ -29,5 +31,3 @@ jobs:
           git add docs/
           git diff --cached --quiet || git commit -m "Sync wiki content from POCs.wiki"
           git push
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
