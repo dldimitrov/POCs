@@ -2,7 +2,9 @@ name: Sync Wiki to Docs
 
 on:
   schedule:
-    - cron: '*/5 * * * *' # Every 5 minutes
+    - cron: '0 0 * * *' # Once a day at midnight UTC
+    # Uncomment the line below to run every 5 minutes instead
+  #  - cron: '*/5 * * * *' # Every 5 minutes
   workflow_dispatch:
 
 jobs:
