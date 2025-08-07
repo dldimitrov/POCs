@@ -2,7 +2,7 @@ name: Sync Wiki to Docs
 
 on:
   schedule:
-    - cron: '0 * * * *' # Every hour
+    - cron: '*/5 * * * *' # Every 5 minutes
   workflow_dispatch:
 
 jobs:
@@ -24,10 +24,15 @@ jobs:
           # Rename Home.md to index.md for TechDocs if exists
           if [ -f docs/Home.md ]; then mv docs/Home.md docs/index.md; fi
 
-      - name: Commit and push changes
+      - name: Commit and push changes (only if needed)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/
-          git diff --cached --quiet || git commit -m "Sync wiki content from POCs.wiki"
-          git push
+          # Only commit and push if there are changes
+          if ! git status --porcelain docs/ | grep .; then
+            echo "No changes to docs. Skipping commit and push."
+          else
+            git commit -m "Sync wiki content from POCs.wiki"
+            git push
+          fi
