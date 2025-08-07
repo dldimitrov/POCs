@@ -2,31 +2,32 @@ name: Sync Wiki to Docs
 
 on:
   schedule:
-    - cron: '0 * * * *' # every hour
+    - cron: '0 * * * *' # Every hour
   workflow_dispatch:
 
 jobs:
   sync-wiki:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout docs repo
+      - name: Checkout main repo
         uses: actions/checkout@v4
 
       - name: Clone Wiki repository
-        run: |
-          git clone https://github.com/dldimitrov/POCs.wiki.git wiki
+        run: git clone https://github.com/dldimitrov/POCs.wiki.git wiki
 
-      - name: Sync wiki content
+      - name: Sync wiki content to /docs
         run: |
-          rsync -av --delete wiki/ docs/
-        # This copies everything from the wiki repo to a /docs folder
+          mkdir -p docs
+          rsync -av --delete --exclude='.git' wiki/ docs/
+          # Optionally rename Home.md to index.md for TechDocs
+          if [ -f docs/Home.md ]; then mv docs/Home.md docs/index.md; fi
 
       - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/
-          git diff --cached --quiet || git commit -m "Sync wiki content"
+          git diff --cached --quiet || git commit -m "Sync wiki content from POCs.wiki"
           git push
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
