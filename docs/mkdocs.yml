@@ -1,0 +1,10 @@
+site_name: 'BS-POC'
+site_description: BS-POC
+
+nav:
+  - Home: Home.md
+  - Index: index.md
+
+
+plugins:
+  - techdocs-core
